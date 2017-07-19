@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::showPortInfo);
 
     fillPortsInfo();
-    updateButtons();
+    //updateButtons();
 }
 
 MainWindow::~MainWindow()
@@ -44,6 +44,11 @@ void MainWindow::showPortInfo(int idx)
 
     ui->descriptionLabel->setText(tr("Description: %1").arg(list.count() > 1 ? list.at(1) : tr(blankString)));
     ui->vidLabel->setText(tr("Identifier: %1").arg(list.count() > 5 ? list.at(5) +" - "+ (list.count() > 6 ? list.at(6) : tr(blankString)) : tr(blankString) ));
+
+    on_pushButtonControl1_ON_clicked(true);
+    on_pushButtonControl0_OFF_clicked(true);
+
+    updateButtons();
 
     /*ui->descriptionLabel->setText(tr("Description: %1").arg(list.count() > 1 ? list.at(1) : tr(blankString)));
     ui->manufacturerLabel->setText(tr("Manufacturer: %1").arg(list.count() > 2 ? list.at(2) : tr(blankString)));
@@ -91,7 +96,7 @@ void MainWindow::openSerialPort()
                           .arg(ui->serialPortInfoListBox->currentText()));
        isConnected = true;
 
-       on_pushButtonControl1_ON_clicked(true);  // Activate relay1
+       // on_pushButtonControl1_ON_clicked(true);  // Activate relay1  //experiment!
 
     } else {
         QMessageBox::critical(this, tr("Error"), serial->errorString());
@@ -115,7 +120,7 @@ void MainWindow::closeSerialPort()
 
 void MainWindow::on_pushButtonConnect_clicked()
 {
-   if(isConnected == false)
+  /* if(isConnected == false)
    {
       openSerialPort();
    }
@@ -132,7 +137,7 @@ void MainWindow::on_pushButtonConnect_clicked()
    {
       ui->pushButtonConnect->setText("connect");
    }
-
+*/
    updateButtons();
 }
 
@@ -149,7 +154,7 @@ void MainWindow::showStatusMessage(const QString &message)
 
 void MainWindow::updateButtons()
 {
-  if(isConnected == false)
+  /*if(isConnected == false)
   {
     ui->pushButtonControl0_OFF->setEnabled(false);
     ui->pushButtonControl0_ON->setEnabled(false);
@@ -157,7 +162,7 @@ void MainWindow::updateButtons()
     ui->pushButtonControl1_ON->setEnabled(false);
     ui->enDebugger->setEnabled(false);
   }
-  else
+  else*/
   {
     uint8_t state = getState();
 
@@ -196,7 +201,7 @@ uint8_t MainWindow::getState()
   QString response = write("Report binary\r");
 
 
-  QRegularExpression re("Channels state 0x(\\w)\r");
+  QRegularExpression re("Channels state 0x(\\w*)\r");
   QRegularExpressionMatch match = re.match(response);
   if (match.hasMatch())
   {
@@ -210,6 +215,8 @@ uint8_t MainWindow::getState()
 QString MainWindow::write(QString string)
 {
   QString response;
+
+  openSerialPort();  // testing!
 
   serial->write(string.toStdString().c_str());
   if (serial->waitForBytesWritten(5000))
@@ -236,6 +243,8 @@ QString MainWindow::write(QString string)
   }
 
   showStatusMessage(response);
+
+  closeSerialPort();
 
   return response;
 }

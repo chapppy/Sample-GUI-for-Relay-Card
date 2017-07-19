@@ -20,7 +20,7 @@
    <enum>Qt::NoFocus</enum>
   </property>
   <property name="windowTitle">
-   <string extracomment="Hamoun">Past vedle pasti! (v1.2)</string>
+   <string extracomment="Hamoun">Past vedle pasti! (v2.0)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QGroupBox" name="selectBox">
@@ -39,7 +39,7 @@
      <item row="4" column="0">
       <widget class="QPushButton" name="pushButton">
        <property name="text">
-        <string>Refresh</string>
+        <string>Refresh USB ports</string>
        </property>
       </widget>
      </item>
@@ -63,7 +63,7 @@
      <item row="5" column="0">
       <widget class="QPushButton" name="pushButtonConnect">
        <property name="text">
-        <string>Connect</string>
+        <string>Get status of relay</string>
        </property>
       </widget>
      </item>
