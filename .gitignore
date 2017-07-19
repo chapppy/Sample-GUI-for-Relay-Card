@@ -3,6 +3,8 @@
 *.lo
 *.o
 *.obj
+*.d
+*.dmp
 
 # Precompiled Headers
 *.gch
@@ -26,3 +28,10 @@
 *.exe
 *.out
 *.app
+
+#
+*.~*
+*.bak
+
+#
+Debug/
