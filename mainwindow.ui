@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>252</width>
-    <height>393</height>
+    <height>287</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,55 +20,9 @@
    <enum>Qt::NoFocus</enum>
   </property>
   <property name="windowTitle">
-   <string extracomment="Hamoun">Past vedle pasti! (v2.0)</string>
+   <string extracomment="Hamoun">Past vedle pasti! (v2.1)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QGroupBox" name="selectBox">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>200</y>
-      <width>231</width>
-      <height>151</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Select Serial Port</string>
-    </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="4" column="0">
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>Refresh USB ports</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="vidLabel">
-       <property name="text">
-        <string>Vendor ID:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QComboBox" name="serialPortInfoListBox"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="descriptionLabel">
-       <property name="text">
-        <string>Description:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QPushButton" name="pushButtonConnect">
-       <property name="text">
-        <string>Get status of relay</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
@@ -150,8 +104,8 @@
    <widget class="QCheckBox" name="enDebugger">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>170</y>
+      <x>60</x>
+      <y>160</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -161,6 +115,45 @@
     </property>
     <property name="text">
      <string>Enable debugging</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>230</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>200</y>
+      <width>131</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Refresh USB ports</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>230</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Found port:</string>
     </property>
    </widget>
   </widget>

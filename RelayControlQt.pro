@@ -33,7 +33,7 @@ HEADERS  += mainwindow.h
 FORMS    += mainwindow.ui
 
 
-VERSION = 2.0
+VERSION = 2.1
 # QMAKE_TARGET_COMPANY = company
 QMAKE_TARGET_PRODUCT = Relay control
 # QMAKE_TARGET_DESCRIPTION = description
