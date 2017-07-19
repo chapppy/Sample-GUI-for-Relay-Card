@@ -196,7 +196,7 @@ uint8_t MainWindow::getState()
   QString response = write("Report binary\r");
 
 
-  QRegularExpression re("Channels state 0x(\\w)\r");
+  QRegularExpression re("Channels state 0x(\\w*)\r");
   QRegularExpressionMatch match = re.match(response);
   if (match.hasMatch())
   {

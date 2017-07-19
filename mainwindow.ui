@@ -20,7 +20,7 @@
    <enum>Qt::NoFocus</enum>
   </property>
   <property name="windowTitle">
-   <string extracomment="Hamoun">Past vedle pasti! (v1.2)</string>
+   <string extracomment="Hamoun">Past vedle pasti! (v1.3)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QGroupBox" name="selectBox">
