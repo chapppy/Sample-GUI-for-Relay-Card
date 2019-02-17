@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>252</width>
-    <height>393</height>
+    <width>492</width>
+    <height>233</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,55 +20,9 @@
    <enum>Qt::NoFocus</enum>
   </property>
   <property name="windowTitle">
-   <string extracomment="Hamoun">Past vedle pasti! (v1.3)</string>
+   <string extracomment="Hamoun">Past vedle pasti! By Stepan Hamouz.... (v2.3) </string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QGroupBox" name="selectBox">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>200</y>
-      <width>231</width>
-      <height>151</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Select Serial Port</string>
-    </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="4" column="0">
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>Refresh</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="vidLabel">
-       <property name="text">
-        <string>Vendor ID:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QComboBox" name="serialPortInfoListBox"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="descriptionLabel">
-       <property name="text">
-        <string>Description:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QPushButton" name="pushButtonConnect">
-       <property name="text">
-        <string>Connect</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
@@ -107,6 +61,22 @@
       <string>OFF</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="pushButton_2">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>110</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PushButton</string>
+     </property>
+    </widget>
+    <zorder>pushButton_2</zorder>
+    <zorder>pushButtonControl0_ON</zorder>
+    <zorder>pushButtonControl0_OFF</zorder>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
@@ -118,7 +88,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>VN7600</string>
+     <string>KL30</string>
     </property>
     <widget class="QPushButton" name="pushButtonControl1_ON">
      <property name="geometry">
@@ -150,9 +120,9 @@
    <widget class="QCheckBox" name="enDebugger">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>200</x>
       <y>170</y>
-      <width>141</width>
+      <width>111</width>
       <height>21</height>
      </rect>
     </property>
@@ -163,13 +133,130 @@
      <string>Enable debugging</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>180</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>170</y>
+      <width>131</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Refresh USB ports</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>180</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Found port:</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>10</y>
+      <width>111</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Rellay #3</string>
+    </property>
+    <widget class="QPushButton" name="pushButtonControl2_ON">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>91</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ON</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonControl2_OFF">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>91</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>OFF</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_4">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>10</y>
+      <width>111</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Rellay #4</string>
+    </property>
+    <widget class="QPushButton" name="pushButtonControl3_ON">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>91</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ON</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonControl3_OFF">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>91</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>OFF</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>252</width>
+     <width>492</width>
      <height>21</height>
     </rect>
    </property>

@@ -1,32 +1,160 @@
+/*
+IOController-GUI - the GUI application for project IOController-FW
+Copyright (C) 2017 Stepan Hamouz, s.hamouz@gmail.com
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include <QtSerialPort/QSerialPortInfo>
 #include <QMessageBox>
 #include <QRegularExpression>
+#include <QKeyEvent>
 
+
+static const char USB_DESCRIPTOR[] = "STMicroelectronics Virtual COM Port";
 static const char blankString[] = QT_TRANSLATE_NOOP("SettingsDialog", "N/A");
+
+
+/*
+class keyEnterReceiver : public QWidget
+{
+
+Q_OBJECT
+public:
+    keyEnterReceiver(QWidget * parent = 0) {;}
+    ~keyEnterReceiver() {;}
+
+
+protected:
+    bool eventFilter(QObject* obj, QEvent* event);
+};
+
+bool keyEnterReceiver::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type()==QEvent::KeyPress)
+    {
+        QKeyEvent* key = static_cast<QKeyEvent*>(event);
+        if ( (key->key()==Qt::Key_Enter) || (key->key()==Qt::Key_Return) )
+        {
+            return false;
+        } else
+        {
+            return QObject::eventFilter(obj, event);
+        }
+        return true;
+    } else
+    {
+        return QObject::eventFilter(obj, event);
+    }
+    return false;
+}
+*/
+
+
+void MainWindow::keyPressEvent(QKeyEvent * event)
+{
+    if (event->type()==QEvent::KeyPress)
+    {
+        QKeyEvent* key = static_cast<QKeyEvent*>(event);
+        if (key->key()==Qt::Key_0)
+        {
+          //return false;
+        }
+        else if (key->key()==Qt::Key_1)
+        {
+            if((lastState &0x01) == 0x01)
+            {
+              on_pushButtonControl0_ON_clicked(1);
+            }
+            else
+            {
+              on_pushButtonControl0_OFF_clicked(1);
+            }
+        }
+        else if (key->key()==Qt::Key_2)
+        {
+            if((lastState &0x02) == 0x02)
+            {
+              on_pushButtonControl1_ON_clicked(1);
+            }
+            else
+            {
+              on_pushButtonControl1_OFF_clicked(1);
+            }
+        }
+        else if (key->key()==Qt::Key_3)
+        {
+            if((lastState &0x04) == 0x04)
+            {
+              on_pushButtonControl2_ON_clicked();
+            }
+            else
+            {
+              on_pushButtonControl2_OFF_clicked();
+            }
+        }
+        else if (key->key()==Qt::Key_4)
+        {
+            if((lastState &0x08) == 0x08)
+            {
+              on_pushButtonControl3_ON_clicked();
+            }
+            else
+            {
+              on_pushButtonControl3_OFF_clicked();
+            }
+        }
+        else
+        {
+            //return QObject::eventFilter(obj, event);
+        }
+        //return true;
+    } else
+    {
+        //return QObject::eventFilter(obj, event);
+    }
+
+    updateButtons();
+
+    //return false;
+}
 
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    isConnected(false)
+    isConnected(false),
+    portFound(false),
+    lastState(0)
 {
     ui->setupUi(this);
-
-    //relayState = {false, false};
-
     serial = new QSerialPort(this);
-
     status = new QLabel;
     ui->statusBar->addWidget(status);
 
-    connect(ui->serialPortInfoListBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &MainWindow::showPortInfo);
-
     fillPortsInfo();
+    //on_pushButtonControl1_ON_clicked(true);  // Project dependant
+    write("Configure 4, OUTPP, PPNN\r");  //OUTPP
     updateButtons();
+
+    //keyEnterReceiver* key = new keyEnterReceiver();
+   // ui->statusBar->installEventFilter(key);
+
 }
 
 MainWindow::~MainWindow()
@@ -35,28 +163,8 @@ MainWindow::~MainWindow()
   delete ui;
 }
 
-void MainWindow::showPortInfo(int idx)
-{
-    if (idx == -1)
-        return;
-
-    QStringList list = ui->serialPortInfoListBox->itemData(idx).toStringList();
-
-    ui->descriptionLabel->setText(tr("Description: %1").arg(list.count() > 1 ? list.at(1) : tr(blankString)));
-    ui->vidLabel->setText(tr("Identifier: %1").arg(list.count() > 5 ? list.at(5) +" - "+ (list.count() > 6 ? list.at(6) : tr(blankString)) : tr(blankString) ));
-
-    /*ui->descriptionLabel->setText(tr("Description: %1").arg(list.count() > 1 ? list.at(1) : tr(blankString)));
-    ui->manufacturerLabel->setText(tr("Manufacturer: %1").arg(list.count() > 2 ? list.at(2) : tr(blankString)));
-    ui->serialNumberLabel->setText(tr("Serial number: %1").arg(list.count() > 3 ? list.at(3) : tr(blankString)));
-    ui->locationLabel->setText(tr("Location: %1").arg(list.count() > 4 ? list.at(4) : tr(blankString)));
-    ui->vidLabel->setText(tr("Vendor Identifier: %1").arg(list.count() > 5 ? list.at(5) : tr(blankString)));
-    ui->pidLabel->setText(tr("Product Identifier: %1").arg(list.count() > 6 ? list.at(6) : tr(blankString)));
-   */
-}
-
 void MainWindow::fillPortsInfo()
 {
-    ui->serialPortInfoListBox->clear();
     QString description;
     QString manufacturer;
     QString serialNumber;
@@ -66,32 +174,31 @@ void MainWindow::fillPortsInfo()
         description = info.description();
         manufacturer = info.manufacturer();
         serialNumber = info.serialNumber();
-        list << info.portName()
-             << (!description.isEmpty() ? description : blankString)
-             << (!manufacturer.isEmpty() ? manufacturer : blankString)
-             << (!serialNumber.isEmpty() ? serialNumber : blankString)
-             << info.systemLocation()
-             << (info.vendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : blankString)
-             << (info.productIdentifier() ? QString::number(info.productIdentifier(), 16) : blankString);
 
-        ui->serialPortInfoListBox->addItem(list.first(), list);
+        if(0 == QString::compare(QString(USB_DESCRIPTOR), description, Qt::CaseInsensitive))
+        {
+          ComPorName = QString(info.portName());
+          portFound = true;
+          ui->label->setText(ComPorName);
+        }
     }
 }
 
-void MainWindow::openSerialPort()
+bool MainWindow::openSerialPort()
 {
-    serial->setPortName(ui->serialPortInfoListBox->currentText());
+  bool retVal = false;
+
+  if(true == portFound)
+  {
+    serial->setPortName(ComPorName);
     serial->setBaudRate(QSerialPort::Baud115200);
     serial->setDataBits(QSerialPort::Data8);
     serial->setParity(QSerialPort::NoParity);
     serial->setStopBits(QSerialPort::OneStop);
     serial->setFlowControl(QSerialPort::NoFlowControl);
     if (serial->open(QIODevice::ReadWrite)) {
-       showStatusMessage(tr("Connected to %1")
-                          .arg(ui->serialPortInfoListBox->currentText()));
        isConnected = true;
-
-       on_pushButtonControl1_ON_clicked(true);  // Activate relay1
+       retVal = true;
 
     } else {
         QMessageBox::critical(this, tr("Error"), serial->errorString());
@@ -100,46 +207,26 @@ void MainWindow::openSerialPort()
 
         isConnected = false;
     }
+  }
+
+  return retVal;
 }
 
 void MainWindow::closeSerialPort()
 {
-  if (serial->isOpen())
+  if(true == portFound)
   {
-     serial->close();
-     isConnected = false;
+    if (serial->isOpen())
+    {
+       serial->close();
+       isConnected = false;
+    }
   }
-
-  showStatusMessage(tr("Disconnected"));
-}
-
-void MainWindow::on_pushButtonConnect_clicked()
-{
-   if(isConnected == false)
-   {
-      openSerialPort();
-   }
-   else
-   {
-     closeSerialPort();
-   }
-
-   if(isConnected == true)
-   {
-      ui->pushButtonConnect->setText("disconnect");
-   }
-   else
-   {
-      ui->pushButtonConnect->setText("connect");
-   }
-
-   updateButtons();
 }
 
 void MainWindow::on_pushButtonControl0_clicked(bool checked)
 {
   (void) checked;
-  // serial->write("Disable 0\r");
 }
 
 void MainWindow::showStatusMessage(const QString &message)
@@ -149,20 +236,26 @@ void MainWindow::showStatusMessage(const QString &message)
 
 void MainWindow::updateButtons()
 {
-  if(isConnected == false)
+  if(false == portFound)
   {
     ui->pushButtonControl0_OFF->setEnabled(false);
     ui->pushButtonControl0_ON->setEnabled(false);
     ui->pushButtonControl1_OFF->setEnabled(false);
     ui->pushButtonControl1_ON->setEnabled(false);
+    ui->pushButtonControl2_OFF->setEnabled(false);
+    ui->pushButtonControl2_ON->setEnabled(false);
+    ui->pushButtonControl3_OFF->setEnabled(false);
+    ui->pushButtonControl3_ON->setEnabled(false);
     ui->enDebugger->setEnabled(false);
   }
   else
   {
     uint8_t state = getState();
+    lastState = state;
 
     ui->enDebugger->setEnabled(true);
 
+    // button set 0
     if((state &0x01) == 0x01)
     {
       ui->pushButtonControl0_OFF->setEnabled(false);
@@ -172,9 +265,9 @@ void MainWindow::updateButtons()
     {
       ui->pushButtonControl0_OFF->setEnabled(true);
       ui->pushButtonControl0_ON->setEnabled(false);
-
     }
 
+    // button set 1
     if((state &0x02) == 0x02)
     {
       ui->pushButtonControl1_OFF->setEnabled(false);
@@ -186,6 +279,30 @@ void MainWindow::updateButtons()
       ui->pushButtonControl1_ON->setEnabled(false);
     }
 
+    // button set 2
+    if((state &0x04) == 0x04)
+    {
+      ui->pushButtonControl2_OFF->setEnabled(false);
+      ui->pushButtonControl2_ON->setEnabled(true);
+    }
+    else
+    {
+      ui->pushButtonControl2_OFF->setEnabled(true);
+      ui->pushButtonControl2_ON->setEnabled(false);
+    }
+
+
+    // button set 3
+    if((state &0x08) == 0x08)
+    {
+      ui->pushButtonControl3_OFF->setEnabled(false);
+      ui->pushButtonControl3_ON->setEnabled(true);
+    }
+    else
+    {
+      ui->pushButtonControl3_OFF->setEnabled(true);
+      ui->pushButtonControl3_ON->setEnabled(false);
+    }
   }
 }
 
@@ -211,31 +328,34 @@ QString MainWindow::write(QString string)
 {
   QString response;
 
-  serial->write(string.toStdString().c_str());
-  if (serial->waitForBytesWritten(5000))
+  if(true == openSerialPort())
   {
-    // read response
-    if (serial->waitForReadyRead(5000))
+    serial->write(string.toStdString().c_str());
+    if (serial->waitForBytesWritten(5000))
     {
-      QByteArray responseData = serial->readAll();
-      while (serial->waitForReadyRead(10))
-      responseData += serial->readAll();
+      // read response
+      if (serial->waitForReadyRead(5000))
+      {
+        QByteArray responseData = serial->readAll();
+        while (serial->waitForReadyRead(10))
+        responseData += serial->readAll();
 
-      response = QString(responseData);
-          //emit this->response(response);
+        response = QString(responseData);
+        //emit this->response(response);
+      }
+      else
+      {
+        //emit timeout(tr("Wait read response timeout %1").arg(QTime::currentTime().toString()));
+      }
     }
     else
     {
-      //emit timeout(tr("Wait read response timeout %1").arg(QTime::currentTime().toString()));
+       //emit timeout(tr("Wait write request timeout %1").arg(QTime::currentTime().toString()));
     }
 
+    showStatusMessage(response);
+    closeSerialPort();
   }
-  else
-  {
-     //emit timeout(tr("Wait write request timeout %1").arg(QTime::currentTime().toString()));
-  }
-
-  showStatusMessage(response);
 
   return response;
 }
@@ -270,12 +390,15 @@ void MainWindow::on_pushButtonControl1_OFF_clicked(bool checked)
 
 void MainWindow::on_pushButton_clicked(bool checked)
 {
+  // refresh USB ports
   (void) checked;
   fillPortsInfo();
+  updateButtons();
 }
 
 void MainWindow::on_enDebugger_clicked(bool checked)
 {
+   /*
   if(checked == true)
   {
     write("Configure 3, OUTPP, PPDOWN\r"); //PPDOWN   PPUP
@@ -285,5 +408,42 @@ void MainWindow::on_enDebugger_clicked(bool checked)
   {
     write("Enable 3\r");
     write("Configure 3, IN, PPNO\r");
-  }
+  }*/
+}
+
+void MainWindow::on_pushButtonControl2_ON_clicked()
+{
+  write("Disable 2\r");
+  updateButtons();
+}
+
+void MainWindow::on_pushButtonControl2_OFF_clicked()
+{
+  write("Enable 2\r");
+  updateButtons();
+}
+
+void MainWindow::on_pushButtonControl3_ON_clicked()
+{
+  write("Disable 3\r");
+  updateButtons();
+}
+
+void MainWindow::on_pushButtonControl3_OFF_clicked()
+{
+  write("Enable 3\r");
+  updateButtons();
+}
+
+void MainWindow::on_pushButton_2_clicked(bool checked)
+{
+   (void) checked;
+   write("Configure 4, OUTPP, PPNN\r");  //OUTPP
+
+
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+
 }

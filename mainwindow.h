@@ -20,7 +20,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButtonConnect_clicked();
 
     void on_pushButtonControl0_clicked(bool checked);
 
@@ -36,10 +35,21 @@ private slots:
 
     void on_enDebugger_clicked(bool checked);
 
+    void on_pushButtonControl2_ON_clicked();
+
+    void on_pushButtonControl2_OFF_clicked();
+
+    void on_pushButtonControl3_ON_clicked();
+
+    void on_pushButtonControl3_OFF_clicked();
+
+    void on_pushButton_2_clicked(bool checked);
+
+    void on_pushButton_2_clicked();
+
 private:
-    void showPortInfo(int idx);
     void fillPortsInfo();
-    void openSerialPort();
+    bool openSerialPort();
     void closeSerialPort();
     void showStatusMessage(const QString &message);
     void updateButtons();
@@ -50,10 +60,16 @@ private:
     Ui::MainWindow *ui;
 
     QSerialPort *serial;
+    QString ComPorName;
+    bool portFound;
     QLabel *status;
 
     bool relayState[2];
     bool isConnected;
+    uint8_t lastState;
+
+protected:
+  void keyPressEvent(QKeyEvent * event);
 
 };
 
