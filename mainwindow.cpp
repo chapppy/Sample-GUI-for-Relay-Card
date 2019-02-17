@@ -23,17 +23,124 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtSerialPort/QSerialPortInfo>
 #include <QMessageBox>
 #include <QRegularExpression>
+#include <QKeyEvent>
 
 
 static const char USB_DESCRIPTOR[] = "STMicroelectronics Virtual COM Port";
 static const char blankString[] = QT_TRANSLATE_NOOP("SettingsDialog", "N/A");
 
 
+/*
+class keyEnterReceiver : public QWidget
+{
+
+Q_OBJECT
+public:
+    keyEnterReceiver(QWidget * parent = 0) {;}
+    ~keyEnterReceiver() {;}
+
+
+protected:
+    bool eventFilter(QObject* obj, QEvent* event);
+};
+
+bool keyEnterReceiver::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type()==QEvent::KeyPress)
+    {
+        QKeyEvent* key = static_cast<QKeyEvent*>(event);
+        if ( (key->key()==Qt::Key_Enter) || (key->key()==Qt::Key_Return) )
+        {
+            return false;
+        } else
+        {
+            return QObject::eventFilter(obj, event);
+        }
+        return true;
+    } else
+    {
+        return QObject::eventFilter(obj, event);
+    }
+    return false;
+}
+*/
+
+
+void MainWindow::keyPressEvent(QKeyEvent * event)
+{
+    if (event->type()==QEvent::KeyPress)
+    {
+        QKeyEvent* key = static_cast<QKeyEvent*>(event);
+        if (key->key()==Qt::Key_0)
+        {
+          //return false;
+        }
+        else if (key->key()==Qt::Key_1)
+        {
+            if((lastState &0x01) == 0x01)
+            {
+              on_pushButtonControl0_ON_clicked(1);
+            }
+            else
+            {
+              on_pushButtonControl0_OFF_clicked(1);
+            }
+        }
+        else if (key->key()==Qt::Key_2)
+        {
+            if((lastState &0x02) == 0x02)
+            {
+              on_pushButtonControl1_ON_clicked(1);
+            }
+            else
+            {
+              on_pushButtonControl1_OFF_clicked(1);
+            }
+        }
+        else if (key->key()==Qt::Key_3)
+        {
+            if((lastState &0x04) == 0x04)
+            {
+              on_pushButtonControl2_ON_clicked();
+            }
+            else
+            {
+              on_pushButtonControl2_OFF_clicked();
+            }
+        }
+        else if (key->key()==Qt::Key_4)
+        {
+            if((lastState &0x08) == 0x08)
+            {
+              on_pushButtonControl3_ON_clicked();
+            }
+            else
+            {
+              on_pushButtonControl3_OFF_clicked();
+            }
+        }
+        else
+        {
+            //return QObject::eventFilter(obj, event);
+        }
+        //return true;
+    } else
+    {
+        //return QObject::eventFilter(obj, event);
+    }
+
+    updateButtons();
+
+    //return false;
+}
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     isConnected(false),
-    portFound(false)
+    portFound(false),
+    lastState(0)
 {
     ui->setupUi(this);
     serial = new QSerialPort(this);
@@ -41,8 +148,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->statusBar->addWidget(status);
 
     fillPortsInfo();
-    on_pushButtonControl1_ON_clicked(true);  // Project dependant
+    //on_pushButtonControl1_ON_clicked(true);  // Project dependant
+    write("Configure 4, OUTPP, PPNN\r");  //OUTPP
     updateButtons();
+
+    //keyEnterReceiver* key = new keyEnterReceiver();
+   // ui->statusBar->installEventFilter(key);
+
 }
 
 MainWindow::~MainWindow()
@@ -130,14 +242,20 @@ void MainWindow::updateButtons()
     ui->pushButtonControl0_ON->setEnabled(false);
     ui->pushButtonControl1_OFF->setEnabled(false);
     ui->pushButtonControl1_ON->setEnabled(false);
+    ui->pushButtonControl2_OFF->setEnabled(false);
+    ui->pushButtonControl2_ON->setEnabled(false);
+    ui->pushButtonControl3_OFF->setEnabled(false);
+    ui->pushButtonControl3_ON->setEnabled(false);
     ui->enDebugger->setEnabled(false);
   }
   else
   {
     uint8_t state = getState();
+    lastState = state;
 
     ui->enDebugger->setEnabled(true);
 
+    // button set 0
     if((state &0x01) == 0x01)
     {
       ui->pushButtonControl0_OFF->setEnabled(false);
@@ -147,9 +265,9 @@ void MainWindow::updateButtons()
     {
       ui->pushButtonControl0_OFF->setEnabled(true);
       ui->pushButtonControl0_ON->setEnabled(false);
-
     }
 
+    // button set 1
     if((state &0x02) == 0x02)
     {
       ui->pushButtonControl1_OFF->setEnabled(false);
@@ -159,6 +277,31 @@ void MainWindow::updateButtons()
     {
       ui->pushButtonControl1_OFF->setEnabled(true);
       ui->pushButtonControl1_ON->setEnabled(false);
+    }
+
+    // button set 2
+    if((state &0x04) == 0x04)
+    {
+      ui->pushButtonControl2_OFF->setEnabled(false);
+      ui->pushButtonControl2_ON->setEnabled(true);
+    }
+    else
+    {
+      ui->pushButtonControl2_OFF->setEnabled(true);
+      ui->pushButtonControl2_ON->setEnabled(false);
+    }
+
+
+    // button set 3
+    if((state &0x08) == 0x08)
+    {
+      ui->pushButtonControl3_OFF->setEnabled(false);
+      ui->pushButtonControl3_ON->setEnabled(true);
+    }
+    else
+    {
+      ui->pushButtonControl3_OFF->setEnabled(true);
+      ui->pushButtonControl3_ON->setEnabled(false);
     }
   }
 }
@@ -255,6 +398,7 @@ void MainWindow::on_pushButton_clicked(bool checked)
 
 void MainWindow::on_enDebugger_clicked(bool checked)
 {
+   /*
   if(checked == true)
   {
     write("Configure 3, OUTPP, PPDOWN\r"); //PPDOWN   PPUP
@@ -264,5 +408,42 @@ void MainWindow::on_enDebugger_clicked(bool checked)
   {
     write("Enable 3\r");
     write("Configure 3, IN, PPNO\r");
-  }
+  }*/
+}
+
+void MainWindow::on_pushButtonControl2_ON_clicked()
+{
+  write("Disable 2\r");
+  updateButtons();
+}
+
+void MainWindow::on_pushButtonControl2_OFF_clicked()
+{
+  write("Enable 2\r");
+  updateButtons();
+}
+
+void MainWindow::on_pushButtonControl3_ON_clicked()
+{
+  write("Disable 3\r");
+  updateButtons();
+}
+
+void MainWindow::on_pushButtonControl3_OFF_clicked()
+{
+  write("Enable 3\r");
+  updateButtons();
+}
+
+void MainWindow::on_pushButton_2_clicked(bool checked)
+{
+   (void) checked;
+   write("Configure 4, OUTPP, PPNN\r");  //OUTPP
+
+
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+
 }

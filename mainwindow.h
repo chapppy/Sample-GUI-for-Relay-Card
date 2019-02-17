@@ -35,6 +35,18 @@ private slots:
 
     void on_enDebugger_clicked(bool checked);
 
+    void on_pushButtonControl2_ON_clicked();
+
+    void on_pushButtonControl2_OFF_clicked();
+
+    void on_pushButtonControl3_ON_clicked();
+
+    void on_pushButtonControl3_OFF_clicked();
+
+    void on_pushButton_2_clicked(bool checked);
+
+    void on_pushButton_2_clicked();
+
 private:
     void fillPortsInfo();
     bool openSerialPort();
@@ -54,6 +66,10 @@ private:
 
     bool relayState[2];
     bool isConnected;
+    uint8_t lastState;
+
+protected:
+  void keyPressEvent(QKeyEvent * event);
 
 };
 
